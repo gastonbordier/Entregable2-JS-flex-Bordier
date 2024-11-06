@@ -1,4 +1,4 @@
-const catalogoData = [
+localStorage.setItem("catalogo",JSON.stringify([
     {
         "id": 1,
         "nombre": "Campera Rodil Negro",
@@ -24,105 +24,159 @@ const catalogoData = [
         "nombre": "Campera Render Negro",
         "precio": 65000
     }
-];
+]));
 
-let finalizar = false;
-let carritoData = [];
+function obtenerCatalogoData(){
+    return JSON.parse(localStorage.getItem("catalogo"));
+}
 
-while (!finalizar) {
+function agregarProductoStorage(producto){
+    let catalogo = JSON.parse(localStorage.getItem("catalogo"));
+    catalogo.push(producto);
+    localStorage.setItem("catalogo", JSON.stringify(catalogo));
+    
+}
 
-    let textoMenu = 'Bienvenido al shop! Que desea hacer? Ingrese el numero de la accion que desea realizar: \n' +
-        '1 -> Comprar en Catalogo \n' +
-        '2 -> Ver carrito \n' +
-        '3 -> Comprar \n' +
-        '4 -> Finalizar \n';
+function editarProductoStorage(index, producto){
+    let catalogoData = obtenerCatalogoData();
+    catalogoData[index] = producto;
+    localStorage.setItem("catalogo", JSON.stringify(catalogoData));
+}
 
-    let opcion = prompt(textoMenu);
+function eliminarProductoStorage(id){
+    let catalogoData = obtenerCatalogoData();
+    let index = catalogoData.findIndex(producto => producto.id == id);
+    if (index !== -1)
+        catalogoData.splice(index, 1);
+    localStorage.setItem("catalogo", JSON.stringify(catalogoData));   
+}
 
 
-    switch (opcion) {
-        case "1":
-            catalogo();
-            break;
-        case "2":
-            carrito();
-            break;
-        case "3":
-            comprar();
-        case "4":
-            finalizar = true;
-            alert("Hasta luego!")
-            break;
 
-        default:
-            alert("Ha ingresado una opcion invalida. Intentelo de nuevo");
-            break;
+let vistaCatalogo = document.querySelector('.catalogo');
+let vistaInput = document.querySelector('.vista-input');
+let indexEditar;
+
+document.querySelector('.agregar').addEventListener("click", () => abrirVistaAgregar());
+
+cargarCatalogo();
+
+function cargarCatalogo() {
+    obtenerCatalogoData().forEach(v => {
+        let cardProducto = document.createElement('div');
+        cardProducto.innerHTML = productoItemHtml(v);
+        vistaCatalogo.append(cardProducto);
+    });
+
+    let botonesEliminar = document.getElementsByClassName('eliminar');
+    for (const boton of botonesEliminar) {
+        boton.addEventListener("click", () => eliminarProducto(boton.id));
     }
 
-}
-
-function catalogo() {
-    let textoCatalogo = 'Este es nuestro catalogo. Ingrese el numero del articulo que desea agregar al carrito:\n';
-    textoCatalogo += imprimirArticulos(catalogoData);
-
-    let itemElegido = prompt(textoCatalogo);
-
-    switch (itemElegido) {
-        case "1":
-            carritoData.push(catalogoData[0]);
-            break;
-        case "2":
-            carritoData.push(catalogoData[1]);
-            break;
-        case "3":
-            carritoData.push(catalogoData[2]);
-            break;
-        case "4":
-            carritoData.push(catalogoData[3]);
-            break;
-        case "5":
-            carritoData.push(catalogoData[4]);
-            break;
-
-        default:
-            alert("Ha ingresado una opcion invalida. Intentelo de nuevo");
-            break;
+    let botonesEditar = document.getElementsByClassName('editar');
+    for (const boton of botonesEditar) {
+        boton.addEventListener("click", () => abrirVistaEditar(boton.id));
     }
 
-}
 
-function carrito() {
-    let textoCarrito = 'Este es tu carrito: \n';
-    textoCarrito += imprimirArticulos(carritoData);
-    textoCarrito += 'Total: $ ' + calcularTotal(carritoData);
-
-    alert(textoCarrito);
-}
-
-function comprar() {
-    let textoCarrito = 'Felicidades! Has comprado los siguientes articulos: \n';
-    textoCarrito += imprimirArticulos(carritoData);
-    textoCarrito += 'Total: $ ' + calcularTotal(carritoData);
-
-    alert(textoCarrito);
 
 }
 
-function imprimirArticulos(articulosData) {
-    let texto = '';
-    for (item of articulosData) {
-        texto += item.id + ': ' + item.nombre + '. Precio: $' + item.precio + '.\n';
+function abrirVistaAgregar() {
+    vistaInput.innerHTML = vistaInputHtml('Agregar producto');
+
+    let catalogoData = obtenerCatalogoData();
+    let ultimoIndex = catalogoData.length - 1;
+    let UltimoProducto = catalogoData[ultimoIndex];
+
+    if (UltimoProducto != null)
+        document.getElementById('input-id').value = Number(UltimoProducto.id) + 1;
+    else
+        document.getElementById('input-id').value = 1;
+
+    document.querySelector('.guardar').addEventListener("click", () => agregar());
+    document.querySelector('.cancelar').addEventListener("click", () => limpiar());
+}
+
+function agregar() {
+    let producto = {};
+    producto.id = document.getElementById('input-id').value;
+    producto.nombre = document.getElementById('input-nombre').value;
+    producto.precio = document.getElementById('input-precio').value;
+    agregarProductoStorage(producto);
+
+    limpiar();
+
+    actualizarCatalogo();
+}
+
+function eliminarProducto(id) {
+    eliminarProductoStorage(id);
+    actualizarCatalogo();
+}
+
+function abrirVistaEditar(id) {
+    let catalogoData = obtenerCatalogoData();
+    indexEditar = catalogoData.findIndex(producto => producto.id == id);
+    if (indexEditar !== -1) {
+        vistaInput.innerHTML = vistaInputHtml('Editar producto');
+        let producto = catalogoData.at(indexEditar);
+        document.getElementById('input-id').value = producto.id;
+        document.getElementById('input-nombre').value = producto.nombre;
+        document.getElementById('input-precio').value = producto.precio;
+
+        document.querySelector('.guardar').addEventListener("click", () => editar());
+        document.querySelector('.cancelar').addEventListener("click", () => limpiar());
+    }
+}
+
+function editar() {
+    let producto = {}
+    producto.id = document.getElementById('input-id').value;
+    producto.nombre = document.getElementById('input-nombre').value;
+    producto.precio = document.getElementById('input-precio').value;
+    editarProductoStorage(indexEditar, producto);
+   
+
+    limpiar();
+    actualizarCatalogo();
+}
+
+function actualizarCatalogo() {
+    vistaCatalogo.innerHTML = '';
+    cargarCatalogo();
+}
+
+function limpiar() {
+    vistaInput.innerHTML = '';
+}
+
+function productoItemHtml(data) {
+    return `
+        <div class="producto" id=${data.id}>
+            <span>${data.id}</span>
+            <span>${data.nombre}</span>
+            <span>$ ${data.precio}</span>
+            <button type="button" class="btn btn-primary editar" id=${data.id}>Editar</button>
+            <button type="button" class="btn btn-danger eliminar" id=${data.id}>Eliminar</button>
+        </div>
+        `;
     }
 
-    return texto;
-}
-
-function calcularTotal(articulosData) {
-    let total = 0;
-
-    for (item of articulosData) {
-        total += item.precio;
-    }
-
-    return total;
+function vistaInputHtml(titulo) {
+    return `
+        <div class="vista-input">
+            <h2>${titulo}</h2>
+            <label for="nombre">Id:</label>
+            <input type="text" id="input-id" readonly>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="input-nombre">
+            <label for="Precio">Precio: $</label>
+            <input type="text" id="input-precio">
+            <div>
+                <button type="button" class="btn btn-primary guardar">Guardar</button>
+                <button type="button" class="btn btn-danger cancelar">Cancelar</button>
+            </div>
+        </div>
+    `;
 }

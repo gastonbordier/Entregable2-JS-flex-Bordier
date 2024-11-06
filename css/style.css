@@ -1,0 +1,83 @@
+*{
+    font-family: 'Montserrat';
+}
+
+body {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+header {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+header span {
+    align-self: flex-end;
+}
+
+header h2 {
+    margin: 0;
+}
+
+main {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 25px 0;
+}
+
+
+
+button.agregar {
+    align-self: flex-end;
+    padding: 6px 35px;
+    margin: 10px;
+}
+
+.catalogo {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+}
+
+.producto {
+    align-self: flex-end;
+    display: grid;
+    grid-template-columns: 1fr 5fr 5fr 3fr 3fr;
+    gap: 15px;
+    padding: 6px 35px;
+    margin: 6px 10px;
+}
+.producto span{
+    margin: 3px 15px;
+}
+
+.vista-input {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 50px 10px 10px 10px;
+}
+
+.vista-input input {
+    margin: 10px auto;
+}
+
+.vista-input div {
+    margin: 10px auto;
+}
+
+@font-face {
+    font-family: Montserrat-A;
+    src: url('/assets/fonts/Montserrat/Montserrat-Variable.ttf');
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: light;
+}
